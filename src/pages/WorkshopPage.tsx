@@ -16,7 +16,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 export function WorkshopPage() {
   const navigate = useNavigate();
   const { setProductions, setSettings } = useStore();
-  const { darkMode, toggleDarkMode } = useTheme();
+  const { darkMode } = useTheme();
   const [newProductionOpen, setNewProductionOpen] = useState(false);
   const [testDialogOpen, setTestDialogOpen] = useState(false);
   const [selectedProduction, setSelectedProduction] = useState<Production | null>(null);
@@ -114,20 +114,11 @@ export function WorkshopPage() {
             </div>
             
             <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={toggleDarkMode}
-                title="Tema Değiştir"
-                className={darkMode ? 'text-[#8b949e] hover:text-[#e6edf3]' : 'text-gray-600 hover:text-gray-900'}
-              >
-                {darkMode ? '☀️' : '🌙'}
-              </Button>
               {!settings?.isPremium && (
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="gap-2 border-yellow-300 text-yellow-700 hover:bg-yellow-50"
+                  className={`gap-2 ${darkMode ? 'border-amber-500 text-amber-300 hover:bg-[#1f232a]' : 'border-yellow-300 text-yellow-700 hover:bg-yellow-50'}`}
                   onClick={() => navigate('/premium')}
                 >
                   <Crown className="h-4 w-4" />
@@ -135,9 +126,9 @@ export function WorkshopPage() {
                 </Button>
               )}
               {settings?.isPremium && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-yellow-100 to-amber-100 rounded-full border border-yellow-300">
-                  <Crown className="h-4 w-4 text-yellow-600" />
-                  <span className="text-sm font-medium text-yellow-700">Premium</span>
+                <div className={`${darkMode ? 'bg-[#1f232a] border-amber-500' : 'bg-gradient-to-r from-yellow-100 to-amber-100 border-yellow-300'} flex items-center gap-2 px-3 py-1.5 rounded-full border`}>
+                  <Crown className={`h-4 w-4 ${darkMode ? 'text-amber-400' : 'text-yellow-600'}`} />
+                  <span className={`text-sm font-medium ${darkMode ? 'text-amber-300' : 'text-yellow-700'}`}>Premium</span>
                 </div>
               )}
               <Button 
