@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Star, Copy, BookOpen } from 'lucide-react';
 import { db, Production } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';

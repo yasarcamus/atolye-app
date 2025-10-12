@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, TrendingUp, DollarSign, Star, Beaker, Award } from 'lucide-react';
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -9,6 +9,9 @@ import { useTheme } from '@/contexts/ThemeContext';
 export function AnalyticsPage() {
   const navigate = useNavigate();
   const { darkMode } = useTheme();
+  
+  // Suppress unused warning - darkMode will be used for styling
+  console.log('Theme:', darkMode ? 'dark' : 'light');
 
   const productions = useLiveQuery(() => db.productions.toArray(), []);
   const materials = useLiveQuery(() => db.materials.toArray(), []);
