@@ -23,43 +23,51 @@ export function SettingsPage() {
     const name = localStorage.getItem('distil_user_name') || '';
     setUserName(name);
     
+    // Get dark mode from localStorage (not DB)
+    const savedDarkMode = localStorage.getItem('darkMode');
+    const isDark = savedDarkMode === null ? true : savedDarkMode === 'true';
+    setDarkMode(isDark);
+    
     if (dbSettings) {
       setNotificationTime(dbSettings.notificationTime);
       setNotificationsEnabled(dbSettings.notificationsEnabled);
-      setDarkMode(dbSettings.darkMode || false);
     }
   }, [dbSettings]);
 
   const handleSave = async () => {
     // Save user name
     localStorage.setItem('distil_user_name', userName);
+    
+    // Save dark mode to localStorage
+    localStorage.setItem('darkMode', darkMode.toString());
 
     // Update settings in DB
     if (dbSettings?.id) {
       await db.settings.update(dbSettings.id, {
         notificationTime,
         notificationsEnabled,
-        darkMode,
         updatedAt: new Date(),
       });
       
       // Apply dark mode
       if (darkMode) {
-        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+        document.body.classList.remove('light');
       } else {
-        document.documentElement.classList.remove('dark');
+        document.body.classList.add('light');
+        document.body.classList.remove('dark');
       }
       
       setSettings({
         ...dbSettings,
         notificationTime,
         notificationsEnabled,
-        darkMode,
         updatedAt: new Date(),
       });
     }
 
     alert('Ayarlar kaydedildi!');
+    navigate('/workshop');
   };
 
   const handleClearData = async () => {
@@ -74,9 +82,9 @@ export function SettingsPage() {
   const productionCount = useLiveQuery(() => db.productions.count(), []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className={`min-h-screen ${darkMode ? 'bg-[#0D1117]' : 'bg-gradient-to-br from-gray-50 to-gray-100'}`}>
       {/* Header */}
-      <header className="bg-white border-b shadow-sm">
+      <header className={`${darkMode ? 'bg-[#161B22] border-[#30363d]' : 'bg-white border-gray-200'} border-b shadow-sm`}>
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Button 
@@ -87,7 +95,7 @@ export function SettingsPage() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold">Ayarlar</h1>
+              <h1 className={`text-2xl font-bold ${darkMode ? 'text-[#e6edf3]' : 'text-gray-900'}`}>Ayarlar</h1>
               <p className="text-sm text-muted-foreground">Hesap ve bildirim ayarları</p>
             </div>
           </div>

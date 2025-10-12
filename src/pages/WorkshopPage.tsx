@@ -10,6 +10,7 @@ import { Plus, Beaker, Settings, Crown, LogOut, Package, BookOpen, BarChart3 } f
 import { useLiveQuery } from 'dexie-react-hooks';
 import { startNotificationService } from '@/lib/notifications';
 import { signOut } from '@/lib/firebase';
+import { addPossessiveSuffix } from '@/lib/turkishGrammar';
 
 export function WorkshopPage() {
   const navigate = useNavigate();
@@ -40,10 +41,18 @@ export function WorkshopPage() {
     if (name) setUserName(name);
     if (email) setUserEmail(email);
     
-    // Check dark mode preference
+    // Check dark mode preference - default true
     const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode !== null) {
-      setDarkMode(savedDarkMode === 'true');
+    const isDark = savedDarkMode === null ? true : savedDarkMode === 'true';
+    setDarkMode(isDark);
+    
+    // Apply immediately
+    if (isDark) {
+      document.body.classList.add('dark');
+      document.body.classList.remove('light');
+    } else {
+      document.body.classList.add('light');
+      document.body.classList.remove('dark');
     }
   }, []);
 
@@ -127,7 +136,7 @@ export function WorkshopPage() {
               </div>
               <div>
                 <h1 className={`text-2xl font-bold tracking-tight ${darkMode ? 'text-[#e6edf3]' : 'text-gray-900'}`}>
-                  {userName}'in Atölyesi
+                  {addPossessiveSuffix(userName)} Atölyesi
                 </h1>
                 <p className={`text-sm ${darkMode ? 'text-[#8b949e]' : 'text-gray-600'}`}>{userEmail || 'Parfüm üretim merkezi'}</p>
               </div>
@@ -241,22 +250,22 @@ export function WorkshopPage() {
           <div className="flex gap-2">
             <Button
               variant={filter === 'all' ? 'default' : 'outline'}
-              size="sm"
               onClick={() => setFilter('all')}
+              className={darkMode && filter === 'all' ? 'bg-[#C0A080] hover:bg-[#D4B99D] text-[#0D1117]' : ''}
             >
               Tümü
             </Button>
             <Button
               variant={filter === 'active' ? 'default' : 'outline'}
-              size="sm"
               onClick={() => setFilter('active')}
+              className={darkMode && filter === 'active' ? 'bg-[#C0A080] hover:bg-[#D4B99D] text-[#0D1117]' : ''}
             >
               Aktif
             </Button>
             <Button
               variant={filter === 'completed' ? 'default' : 'outline'}
-              size="sm"
               onClick={() => setFilter('completed')}
+              className={darkMode && filter === 'completed' ? 'bg-[#C0A080] hover:bg-[#D4B99D] text-[#0D1117]' : ''}
             >
               Tamamlananlar
             </Button>
@@ -265,7 +274,7 @@ export function WorkshopPage() {
           <Button 
             onClick={() => setNewProductionOpen(true)}
             disabled={!canAddProduction}
-            className="gap-2 shadow-md hover:shadow-lg transition-all"
+            className={`gap-2 ${darkMode ? 'bg-[#C0A080] hover:bg-[#D4B99D] text-[#0D1117]' : ''}`}
           >
             <Plus className="h-4 w-4" />
             Yeni Üretim
