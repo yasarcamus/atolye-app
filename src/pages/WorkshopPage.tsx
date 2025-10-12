@@ -11,17 +11,18 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { startNotificationService } from '@/lib/notifications';
 import { signOut } from '@/lib/firebase';
 import { addPossessiveSuffix } from '@/lib/turkishGrammar';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export function WorkshopPage() {
   const navigate = useNavigate();
   const { setProductions, setSettings } = useStore();
+  const { darkMode, toggleDarkMode } = useTheme();
   const [newProductionOpen, setNewProductionOpen] = useState(false);
   const [testDialogOpen, setTestDialogOpen] = useState(false);
   const [selectedProduction, setSelectedProduction] = useState<Production | null>(null);
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
-  const [darkMode, setDarkMode] = useState(true);
 
   // Live query for productions
   const productions = useLiveQuery(
@@ -40,33 +41,7 @@ export function WorkshopPage() {
     
     if (name) setUserName(name);
     if (email) setUserEmail(email);
-    
-    // Check dark mode preference - default true
-    const savedDarkMode = localStorage.getItem('darkMode');
-    const isDark = savedDarkMode === null ? true : savedDarkMode === 'true';
-    setDarkMode(isDark);
-    
-    // Apply immediately
-    if (isDark) {
-      document.body.classList.add('dark');
-      document.body.classList.remove('light');
-    } else {
-      document.body.classList.add('light');
-      document.body.classList.remove('dark');
-    }
   }, []);
-
-  useEffect(() => {
-    // Apply dark mode to body
-    if (darkMode) {
-      document.body.classList.add('dark');
-      document.body.classList.remove('light');
-    } else {
-      document.body.classList.add('light');
-      document.body.classList.remove('dark');
-    }
-    localStorage.setItem('darkMode', darkMode.toString());
-  }, [darkMode]);
 
   useEffect(() => {
     if (productions) {
@@ -119,10 +94,6 @@ export function WorkshopPage() {
 
   const activeCount = productions?.filter(p => p.status === 'active').length || 0;
   const canAddProduction = settings?.isPremium || activeCount < 5;
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-[#0D1117]' : 'bg-gradient-to-br from-gray-50 to-gray-100'}`}>

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { WelcomePage } from '@/pages/WelcomePage';
 import { WorkshopPage } from '@/pages/WorkshopPage';
 import { SettingsPage } from '@/pages/SettingsPage';
@@ -21,8 +22,9 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <Routes>
+    <ThemeProvider>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
         <Route path="/" element={<WelcomePage />} />
         <Route 
           path="/workshop" 
@@ -80,8 +82,9 @@ function App() {
             </ProtectedRoute>
           } 
         />
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

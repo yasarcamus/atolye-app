@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { ArrowLeft, Plus, Trash2, Edit, Package } from 'lucide-react';
+import { ArrowLeft, Plus, Package, Edit, Trash2 } from 'lucide-react';
 import { db, Material } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export function MaterialsPage() {
   const navigate = useNavigate();
+  const { darkMode } = useTheme();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
   const [formData, setFormData] = useState({

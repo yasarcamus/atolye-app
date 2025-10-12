@@ -1,24 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Heart, Star, Copy, BookOpen } from 'lucide-react';
+import { Heart, Star, Copy, BookOpen } from 'lucide-react';
 import { db, Production } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export function RecipesPage() {
   const navigate = useNavigate();
-  const [showFavorites, setShowFavorites] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  const { darkMode } = useTheme();
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
-
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode');
-    const isDark = savedDarkMode === null ? true : savedDarkMode === 'true';
-    setDarkMode(isDark);
-  }, []);
 
   const productions = useLiveQuery(
     () => db.productions.where('status').equals('tested').reverse().toArray(),

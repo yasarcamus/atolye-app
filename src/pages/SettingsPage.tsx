@@ -8,25 +8,21 @@ import { ArrowLeft, Bell, Clock, User, Crown, Trash2, Moon, Sun } from 'lucide-r
 import { db } from '@/lib/db';
 import { useStore } from '@/store/useStore';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export function SettingsPage() {
   const navigate = useNavigate();
   const { settings, setSettings } = useStore();
+  const { darkMode, toggleDarkMode } = useTheme();
   const [userName, setUserName] = useState('');
   const [notificationTime, setNotificationTime] = useState('20:00');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
 
   const dbSettings = useLiveQuery(() => db.settings.toCollection().first(), []);
 
   useEffect(() => {
     const name = localStorage.getItem('distil_user_name') || '';
     setUserName(name);
-    
-    // Get dark mode from localStorage (not DB)
-    const savedDarkMode = localStorage.getItem('darkMode');
-    const isDark = savedDarkMode === null ? true : savedDarkMode === 'true';
-    setDarkMode(isDark);
     
     if (dbSettings) {
       setNotificationTime(dbSettings.notificationTime);
@@ -37,9 +33,6 @@ export function SettingsPage() {
   const handleSave = async () => {
     // Save user name
     localStorage.setItem('distil_user_name', userName);
-    
-    // Save dark mode to localStorage
-    localStorage.setItem('darkMode', darkMode.toString());
 
     // Update settings in DB
     if (dbSettings?.id) {
@@ -48,15 +41,6 @@ export function SettingsPage() {
         notificationsEnabled,
         updatedAt: new Date(),
       });
-      
-      // Apply dark mode
-      if (darkMode) {
-        document.body.classList.add('dark');
-        document.body.classList.remove('light');
-      } else {
-        document.body.classList.add('light');
-        document.body.classList.remove('dark');
-      }
       
       setSettings({
         ...dbSettings,
@@ -138,19 +122,15 @@ export function SettingsPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Karanlık Mod</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Gece kullanımı için koyu tema
-                  </p>
+                <div className="flex items-center gap-2">
+                  {darkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                  <span>Karanlık Mod</span>
                 </div>
                 <Button
-                  variant={darkMode ? 'default' : 'outline'}
+                  variant="outline"
                   size="sm"
-                  onClick={() => setDarkMode(!darkMode)}
-                  className="gap-2"
+                  onClick={toggleDarkMode}
                 >
-                  {darkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
                   {darkMode ? 'Açık' : 'Kapalı'}
                 </Button>
               </div>
