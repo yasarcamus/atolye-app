@@ -24,6 +24,7 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
     alcoholBrand: '',
     bottleSize: 30,
     macerationDays: 15,
+    shakingFrequency: 1, // daily by default
     notes: '',
     // Cost calculation
     alcoholCostPerMl: 0,
@@ -51,6 +52,8 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
     const bottleCost = formData.bottleCostPerAdet || 0;
     const totalCost = alcoholCost + essenceCost + waterCost + bottleCost;
 
+    const nextShakingDate = addDays(startDate, formData.shakingFrequency);
+
     const production: Omit<Production, 'id'> = {
       name: formData.name,
       essenceName: formData.essenceName,
@@ -63,6 +66,10 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
       daysRemaining: formData.macerationDays,
       notes: formData.notes,
       status: 'active' as const,
+      shakingFrequency: formData.shakingFrequency,
+      shakingHistory: [],
+      lastShakingDate: undefined,
+      nextShakingDate,
       alcoholCost: formData.alcoholCostPerMl ? Number(formData.alcoholCostPerMl) : undefined,
       waterCost: formData.waterCostPerMl ? Number(formData.waterCostPerMl) : undefined,
       essenceCost: formData.essenceCostPerMl ? Number(formData.essenceCostPerMl) : undefined,
@@ -83,6 +90,7 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
       alcoholBrand: '',
       bottleSize: 30,
       macerationDays: 15,
+      shakingFrequency: 1,
       notes: '',
       alcoholCostPerMl: 0,
       waterCostPerMl: 0,
@@ -138,7 +146,7 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
   };
 
   // Enter to focus next input within the form
-  const handleEnterNext = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleEnterNext = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const form = formRef.current;
@@ -248,6 +256,25 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
                 required
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="shakingFrequency">Çalkalama Sıklığı 🔔</Label>
+            <select
+              id="shakingFrequency"
+              value={formData.shakingFrequency}
+              onChange={(e) => setFormData({ ...formData, shakingFrequency: Number(e.target.value) })}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              onKeyDown={handleEnterNext}
+            >
+              <option value={1}>Her gün</option>
+              <option value={2}>2 günde bir</option>
+              <option value={3}>3 günde bir</option>
+              <option value={7}>Haftada bir</option>
+            </select>
+            <p className="text-xs text-muted-foreground">
+              Dinlenme süresince karışımı çalkalaman için hatırlatıcı
+            </p>
           </div>
 
           {canAddCostCalculation && (

@@ -1,24 +1,47 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Production } from '@/lib/db';
+import { Production, db } from '@/lib/db';
 import { Calendar, Droplet, Beaker, Clock, DollarSign } from 'lucide-react';
-import { differenceInDays, format } from 'date-fns';
+import { differenceInDays, format, addDays } from 'date-fns';
 import { tr } from 'date-fns/locale';
 
 interface ProductionCardProps {
   production: Production;
   onTest: (production: Production) => void;
   onView: (production: Production) => void;
+  onShake?: (production: Production) => void;
 }
 
-export function ProductionCard({ production, onTest, onView }: ProductionCardProps) {
+export function ProductionCard({ production, onTest, onView, onShake }: ProductionCardProps) {
   const daysRemaining = differenceInDays(production.endDate, new Date());
   const totalDays = differenceInDays(production.endDate, production.startDate);
   const progress = Math.max(0, Math.min(100, ((totalDays - daysRemaining) / totalDays) * 100));
   
   const isReady = daysRemaining <= 0;
   const isActive = production.status === 'active';
+
+  // Shaking reminder logic
+  const needsShaking = production.nextShakingDate && new Date() >= production.nextShakingDate;
+  
+  const handleShake = async () => {
+    if (!production.id) return;
+    
+    const now = new Date();
+    const nextShaking = addDays(now, production.shakingFrequency || 1);
+    
+    await db.productions.update(production.id, {
+      lastShakingDate: now,
+      nextShakingDate: nextShaking,
+      shakingHistory: [
+        ...(production.shakingHistory || []),
+        { date: now, shaken: true }
+      ],
+      updatedAt: now
+    });
+    
+    if (onShake) onShake(production);
+  };
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -88,6 +111,30 @@ export function ProductionCard({ production, onTest, onView }: ProductionCardPro
             <DollarSign className="h-4 w-4 text-muted-foreground" />
             <span className="font-medium">{production.totalCost.toFixed(2)} ₺</span>
             <span className="text-muted-foreground text-xs">maliyet</span>
+          </div>
+        )}
+
+        {isActive && production.shakingFrequency && (
+          <div className="flex items-center justify-between text-xs pt-2 border-t">
+            <span className="text-muted-foreground">
+              {needsShaking ? (
+                <span className="text-orange-600 font-medium">🔔 Çalkalama zamanı!</span>
+              ) : production.nextShakingDate ? (
+                <span>Sonraki: {format(production.nextShakingDate, 'dd MMM', { locale: tr })}</span>
+              ) : (
+                <span>Çalkalama ayarlı</span>
+              )}
+            </span>
+            {needsShaking && (
+              <Button 
+                onClick={handleShake}
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs"
+              >
+                ✓ Çalkaladım
+              </Button>
+            )}
           </div>
         )}
 

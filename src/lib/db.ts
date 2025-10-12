@@ -19,6 +19,12 @@ export interface Production {
   images?: string[];
   dailyNotes?: { date: Date; note: string }[];
   
+  // Shaking reminders
+  shakingFrequency?: number; // days between shakings (1 = daily, 2 = every 2 days)
+  shakingHistory?: { date: Date; shaken: boolean }[];
+  lastShakingDate?: Date;
+  nextShakingDate?: Date;
+  
   // Test results
   longevity?: number;
   sillage?: number;
@@ -53,6 +59,7 @@ export interface UserSettings {
   isPremium: boolean;
   notificationsEnabled: boolean;
   notificationTime: string; // HH:mm format
+  shakingRemindersEnabled: boolean;
   productionLimit: number;
   darkMode: boolean;
   createdAt: Date;
@@ -98,6 +105,7 @@ export const initializeSettings = async () => {
       isPremium: false,
       notificationsEnabled: true,
       notificationTime: '20:00',
+      shakingRemindersEnabled: true,
       productionLimit: 3,
       darkMode: false,
       createdAt: new Date(),
