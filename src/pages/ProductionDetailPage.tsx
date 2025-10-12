@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Star, Heart, Calendar, Droplet, Beaker, DollarSign, Edit, Trash2 } from 'lucide-react';
-import { db, Production } from '@/lib/db';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, Heart, Trash2, Calendar, DollarSign, Edit, Star, Beaker } from 'lucide-react';
+import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { differenceInDays, format } from 'date-fns';
 import { tr } from 'date-fns/locale';

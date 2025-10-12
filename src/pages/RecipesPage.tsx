@@ -31,8 +31,10 @@ export function RecipesPage() {
     }
   };
 
-  const handleCopyRecipe = async (production: Production) => {
-    // Create a new production based on this recipe
+  const handleCopyRecipe = async (productionId: number) => {
+    const production = productions?.find(p => p.id === productionId);
+    if (!production) return;
+
     const newProduction = {
       ...production,
       id: undefined,

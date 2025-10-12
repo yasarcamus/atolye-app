@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { db } from '@/lib/db';
+import { db, Production } from '@/lib/db';
 import { useStore } from '@/store/useStore';
 import { addDays } from 'date-fns';
 
@@ -47,28 +47,28 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
     const waterCost = waterAmount * formData.waterCostPerMl;
     const totalCost = alcoholCost + essenceCost + waterCost;
 
-    const production = {
+    const production: Omit<Production, 'id'> = {
       name: formData.name,
       essenceName: formData.essenceName,
-      essenceRatio: formData.essenceRatio,
-      alcoholRatio: formData.alcoholRatio,
+      essenceRatio: Number(formData.essenceRatio),
+      alcoholRatio: 100 - Number(formData.essenceRatio),
       alcoholBrand: formData.alcoholBrand,
-      bottleSize: formData.bottleSize,
+      bottleSize: Number(formData.bottleSize),
       startDate,
       endDate,
       daysRemaining: formData.macerationDays,
       notes: formData.notes,
       status: 'active' as const,
-      alcoholCost,
-      essenceCost,
-      waterCost,
+      alcoholCost: formData.alcoholCostPerMl ? Number(formData.alcoholCostPerMl) : undefined,
+      waterCost: formData.waterCostPerMl ? Number(formData.waterCostPerMl) : undefined,
+      essenceCost: formData.essenceCostPerMl ? Number(formData.essenceCostPerMl) : undefined,
       totalCost: totalCost > 0 ? totalCost : undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
     const id = await db.productions.add(production);
-    addProduction({ ...production, id });
+    addProduction({ ...production, id: Number(id) });
     
     // Reset form
     setFormData({

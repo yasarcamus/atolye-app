@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Beaker, Target, Users, Briefcase } from 'lucide-react';
+import { Target, Users, Briefcase } from 'lucide-react';
 import { signInWithGoogle } from '@/lib/firebase';
 
 export function WelcomePage() {

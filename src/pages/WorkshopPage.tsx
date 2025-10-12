@@ -20,7 +20,6 @@ export function WorkshopPage() {
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
-  const [userPhoto, setUserPhoto] = useState('');
   const [darkMode, setDarkMode] = useState(true);
 
   // Live query for productions
@@ -37,11 +36,9 @@ export function WorkshopPage() {
   useEffect(() => {
     const name = localStorage.getItem('distil_user_name');
     const email = localStorage.getItem('distil_user_email');
-    const photo = localStorage.getItem('distil_user_photo');
     
     if (name) setUserName(name);
     if (email) setUserEmail(email);
-    if (photo) setUserPhoto(photo);
     
     // Check dark mode preference
     const savedDarkMode = localStorage.getItem('darkMode');
