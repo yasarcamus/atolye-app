@@ -83,8 +83,10 @@ export function MaterialsPage() {
   };
 
   const handleFocusZeroClear = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (e.target.value === '0' || e.target.value === '0.00') {
-      e.target.select();
+    const val = e.target.value;
+    if (val === '0' || val === '0.00' || val === '' || Number(val) === 0) {
+      e.target.value = '';
+      e.target.placeholder = '0';
     }
   };
   const handleBlurRestoreZero = (field: keyof typeof formData) => (e: React.FocusEvent<HTMLInputElement>) => {
@@ -283,6 +285,7 @@ export function MaterialsPage() {
                   onFocus={handleFocusZeroClear}
                   onBlur={handleBlurRestoreZero('pricePerMl')}
                   onKeyDown={handleEnterNext}
+                  placeholder="0"
                 />
               </div>
 
@@ -297,6 +300,7 @@ export function MaterialsPage() {
                   onFocus={handleFocusZeroClear}
                   onBlur={handleBlurRestoreZero('stock')}
                   onKeyDown={handleEnterNext}
+                  placeholder="0"
                 />
               </div>
             </div>

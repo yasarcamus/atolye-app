@@ -125,8 +125,10 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
 
   // Helpers: clear zero on focus and restore 0 on blur if empty
   const handleFocusZeroClear = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (e.target.value === '0' || e.target.value === '0.00') {
-      e.target.select();
+    const val = e.target.value;
+    if (val === '0' || val === '0.00' || val === '' || Number(val) === 0) {
+      e.target.value = '';
+      e.target.placeholder = '0';
     }
   };
   const handleBlurRestoreZero = (field: keyof typeof formData) => (e: React.FocusEvent<HTMLInputElement>) => {
@@ -253,63 +255,67 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
               <h3 className="font-medium text-sm">Maliyet Hesaplama (İsteğe Bağlı)</h3>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="alcoholCost">Alkol (₺/ml)</Label>
+                  <Label htmlFor="alcoholAmount">Alkol (ml)</Label>
                   <Input
-                    id="alcoholCost"
+                    id="alcoholAmount"
                     type="number"
-                    step="0.01"
+                    step="0.1"
                     min="0"
                     value={formData.alcoholCostPerMl}
                     onChange={(e) => setFormData({ ...formData, alcoholCostPerMl: Number(e.target.value) })}
                     onFocus={handleFocusZeroClear}
                     onBlur={handleBlurRestoreZero('alcoholCostPerMl')}
                     onKeyDown={handleEnterNext}
+                    placeholder="0"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="essenceCost">Esans (₺/ml)</Label>
+                  <Label htmlFor="essenceAmount">Esans (ml)</Label>
                   <Input
-                    id="essenceCost"
+                    id="essenceAmount"
                     type="number"
-                    step="0.01"
+                    step="0.1"
                     min="0"
                     value={formData.essenceCostPerMl}
                     onChange={(e) => setFormData({ ...formData, essenceCostPerMl: Number(e.target.value) })}
                     onFocus={handleFocusZeroClear}
                     onBlur={handleBlurRestoreZero('essenceCostPerMl')}
                     onKeyDown={handleEnterNext}
+                    placeholder="0"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="waterCost">Su (₺/ml)</Label>
+                  <Label htmlFor="waterAmount">Su (ml)</Label>
                   <Input
-                    id="waterCost"
+                    id="waterAmount"
                     type="number"
-                    step="0.01"
+                    step="0.1"
                     min="0"
                     value={formData.waterCostPerMl}
                     onChange={(e) => setFormData({ ...formData, waterCostPerMl: Number(e.target.value) })}
                     onFocus={handleFocusZeroClear}
                     onBlur={handleBlurRestoreZero('waterCostPerMl')}
                     onKeyDown={handleEnterNext}
+                    placeholder="0"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="bottleCost">Şişe (₺/adet)</Label>
+                  <Label htmlFor="bottleAmount">Şişe (adet)</Label>
                   <Input
-                    id="bottleCost"
+                    id="bottleAmount"
                     type="number"
-                    step="0.01"
+                    step="1"
                     min="0"
                     value={formData.bottleCostPerAdet}
                     onChange={(e) => setFormData({ ...formData, bottleCostPerAdet: Number(e.target.value) })}
                     onFocus={handleFocusZeroClear}
                     onBlur={handleBlurRestoreZero('bottleCostPerAdet')}
                     onKeyDown={handleEnterNext}
+                    placeholder="0"
                   />
                 </div>
               </div>
