@@ -59,9 +59,9 @@ export function RecipesPage() {
   };
 
   const getAverageRating = (production: Production) => {
-    const ratings = [production.longevity, production.sillage, production.rating].filter(r => r);
+    const ratings = [production.longevity, production.sillage, production.rating].filter((r): r is number => r !== undefined);
     if (ratings.length === 0) return 0;
-    return ratings.reduce((a, b) => (a || 0) + (b || 0), 0) / ratings.length;
+    return ratings.reduce((a, b) => a + b, 0) / ratings.length;
   };
 
   return (
@@ -169,7 +169,7 @@ export function RecipesPage() {
                       variant="outline"
                       size="sm"
                       className="flex-1 gap-2"
-                      onClick={() => handleCopyRecipe(production)}
+                      onClick={() => production.id && handleCopyRecipe(production.id)}
                     >
                       <Copy className="h-4 w-4" />
                       Kopyala
