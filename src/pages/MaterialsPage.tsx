@@ -163,9 +163,9 @@ export function MaterialsPage() {
                   {getTypeName(type)}
                   <span className="text-sm text-muted-foreground font-normal">({items.length})</span>
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin">
                   {items.map((material) => (
-                    <Card key={material.id} className="hover:shadow-md transition-shadow">
+                    <Card key={material.id} className="hover:shadow-md transition-shadow min-w-[280px] snap-start flex-shrink-0">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
                           <div>

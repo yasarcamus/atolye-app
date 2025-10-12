@@ -99,54 +99,54 @@ export function WorkshopPage() {
     <div className={`min-h-screen ${darkMode ? 'bg-[#0D1117]' : 'bg-gradient-to-br from-gray-50 to-gray-100'}`}>
       {/* Header */}
       <header className={`${darkMode ? 'bg-[#161B22] border-[#30363d]' : 'bg-white border-gray-200'} border-b sticky top-0 z-10 shadow-sm`}>
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-[#C0A080] to-[#D4B99D] text-[#0D1117] p-2 rounded-lg shadow-md">
-                <Beaker className="h-6 w-6" />
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+              <div className="bg-gradient-to-br from-[#C0A080] to-[#D4B99D] text-[#0D1117] p-1.5 sm:p-2 rounded-lg shadow-md flex-shrink-0">
+                <Beaker className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              <div>
-                <h1 className={`text-2xl font-bold tracking-tight ${darkMode ? 'text-[#e6edf3]' : 'text-gray-900'}`}>
+              <div className="min-w-0 flex-1">
+                <h1 className={`text-lg sm:text-2xl font-bold tracking-tight truncate ${darkMode ? 'text-[#e6edf3]' : 'text-gray-900'}`}>
                   {addPossessiveSuffix(userName)} Atölyesi
                 </h1>
-                <p className={`text-sm ${darkMode ? 'text-[#8b949e]' : 'text-gray-600'}`}>{userEmail || 'Parfüm üretim merkezi'}</p>
+                <p className={`text-xs sm:text-sm truncate ${darkMode ? 'text-[#8b949e]' : 'text-gray-600'}`}>{userEmail || 'Parfüm üretim merkezi'}</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
               {!settings?.isPremium && (
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className={`gap-2 ${darkMode ? 'border-amber-500 text-amber-300 hover:bg-[#1f232a]' : 'border-yellow-300 text-yellow-700 hover:bg-yellow-50'}`}
+                  className={`gap-1 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9 ${darkMode ? 'border-amber-500 text-amber-300 hover:bg-[#1f232a]' : 'border-yellow-300 text-yellow-700 hover:bg-yellow-50'}`}
                   onClick={() => navigate('/premium')}
                 >
-                  <Crown className="h-4 w-4" />
-                  Premium
+                  <Crown className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline">Premium</span>
                 </Button>
               )}
               {settings?.isPremium && (
-                <div className={`${darkMode ? 'bg-[#1f232a] border-amber-500' : 'bg-gradient-to-r from-yellow-100 to-amber-100 border-yellow-300'} flex items-center gap-2 px-3 py-1.5 rounded-full border`}>
-                  <Crown className={`h-4 w-4 ${darkMode ? 'text-amber-400' : 'text-yellow-600'}`} />
-                  <span className={`text-sm font-medium ${darkMode ? 'text-amber-300' : 'text-yellow-700'}`}>Premium</span>
+                <div className={`${darkMode ? 'bg-[#1f232a] border-amber-500' : 'bg-gradient-to-r from-yellow-100 to-amber-100 border-yellow-300'} flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border`}>
+                  <Crown className={`h-3 w-3 sm:h-4 sm:w-4 ${darkMode ? 'text-amber-400' : 'text-yellow-600'}`} />
+                  <span className={`text-xs sm:text-sm font-medium ${darkMode ? 'text-amber-300' : 'text-yellow-700'}`}>Pro</span>
                 </div>
               )}
               <Button 
                 variant="ghost" 
                 size="icon"
                 onClick={() => navigate('/settings')}
-                className={darkMode ? 'text-[#8b949e] hover:text-[#e6edf3]' : ''}
+                className={`h-8 w-8 sm:h-10 sm:w-10 ${darkMode ? 'text-[#8b949e] hover:text-[#e6edf3]' : ''}`}
               >
-                <Settings className="h-5 w-5" />
+                <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="icon"
                 onClick={handleLogout}
                 title="Çıkış Yap"
-                className={darkMode ? 'text-[#8b949e] hover:text-[#e6edf3]' : ''}
+                className={`h-8 w-8 sm:h-10 sm:w-10 ${darkMode ? 'text-[#8b949e] hover:text-[#e6edf3]' : ''}`}
               >
-                <LogOut className="h-5 w-5" />
+                <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
           </div>
@@ -156,30 +156,33 @@ export function WorkshopPage() {
       {/* Navigation Menu */}
       <div className={`${darkMode ? 'bg-[#161B22] border-[#30363d]' : 'bg-white border-gray-200'} border-b`}>
         <div className="container mx-auto px-4">
-          <div className="flex gap-1 overflow-x-auto">
+          <div className="flex gap-1 overflow-x-auto scrollbar-thin snap-x">
             <Button
               variant="ghost"
-              className={`gap-2 rounded-none border-b-2 border-transparent ${darkMode ? 'text-[#8b949e] hover:text-[#e6edf3] hover:border-[#C0A080]' : 'hover:border-primary'}`}
+              className={`gap-2 rounded-none border-b-2 border-transparent whitespace-nowrap snap-start ${darkMode ? 'text-[#8b949e] hover:text-[#e6edf3] hover:border-[#C0A080]' : 'hover:border-primary'}`}
               onClick={() => navigate('/materials')}
             >
               <Package className="h-4 w-4" />
-              Hammaddeler
+              <span className="hidden sm:inline">Hammaddeler</span>
+              <span className="sm:hidden">Malzeme</span>
             </Button>
             <Button
               variant="ghost"
-              className={`gap-2 rounded-none border-b-2 border-transparent ${darkMode ? 'text-[#8b949e] hover:text-[#e6edf3] hover:border-[#C0A080]' : 'hover:border-primary'}`}
+              className={`gap-2 rounded-none border-b-2 border-transparent whitespace-nowrap snap-start ${darkMode ? 'text-[#8b949e] hover:text-[#e6edf3] hover:border-[#C0A080]' : 'hover:border-primary'}`}
               onClick={() => navigate('/recipes')}
             >
               <BookOpen className="h-4 w-4" />
-              Reçeteler
+              <span className="hidden sm:inline">Reçeteler</span>
+              <span className="sm:hidden">Reçete</span>
             </Button>
             <Button
               variant="ghost"
-              className={`gap-2 rounded-none border-b-2 border-transparent ${darkMode ? 'text-[#8b949e] hover:text-[#e6edf3] hover:border-[#C0A080]' : 'hover:border-primary'}`}
+              className={`gap-2 rounded-none border-b-2 border-transparent whitespace-nowrap snap-start ${darkMode ? 'text-[#8b949e] hover:text-[#e6edf3] hover:border-[#C0A080]' : 'hover:border-primary'}`}
               onClick={() => navigate('/analytics')}
             >
               <BarChart3 className="h-4 w-4" />
-              Raporlar
+              <span className="hidden sm:inline">Raporlar</span>
+              <span className="sm:hidden">Rapor</span>
             </Button>
           </div>
         </div>

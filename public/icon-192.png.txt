@@ -1,0 +1,6 @@
+Bu dosyayı silip 192x192 boyutunda gerçek bir PNG icon ekleyin.
+Icon tasarımı için Canva veya Figma kullanabilirsiniz.
+Renk paleti: 
+- Ana renk: #C0A080 (altın/bakır)
+- Arka plan: #0D1117 (koyu gri)
+- Simge: Beher/şişe görseli
