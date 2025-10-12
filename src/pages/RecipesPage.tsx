@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Heart, Star, Copy, BookOpen } from 'lucide-react';
 import { db, Production } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -10,7 +10,15 @@ import { tr } from 'date-fns/locale';
 
 export function RecipesPage() {
   const navigate = useNavigate();
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
+
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('darkMode');
+    const isDark = savedDarkMode === null ? true : savedDarkMode === 'true';
+    setDarkMode(isDark);
+  }, []);
 
   const productions = useLiveQuery(
     () => db.productions.where('status').equals('tested').reverse().toArray(),
@@ -71,11 +79,11 @@ export function RecipesPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" onClick={() => navigate('/workshop')}>
-                <ArrowLeft className="h-5 w-5" />
+                <BookOpen className="h-6 w-6" />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold">Reçete Bankası</h1>
-                <p className="text-sm text-muted-foreground">Başarılı tarifleriniz</p>
+                <h1 className={`text-2xl font-bold ${darkMode ? 'text-[#e6edf3]' : 'text-gray-900'}`}>Reçete Bankası</h1>
+                <p className={`text-sm ${darkMode ? 'text-[#8b949e]' : 'text-gray-600'}`}>Test edilmiş formülleriniz</p>
               </div>
             </div>
           </div>
@@ -187,17 +195,17 @@ export function RecipesPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-xl border shadow-sm">
-            <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <h3 className="text-lg font-semibold mb-2">
-              {filter === 'favorites' ? 'Henüz favori reçete yok' : 'Henüz test edilmiş üretim yok'}
-            </h3>
-            <p className="text-muted-foreground mb-6">
+          <div className={`text-center py-16 ${darkMode ? 'bg-[#161B22] border-[#30363d]' : 'bg-white border-gray-200'} rounded-xl border shadow-sm`}>
+            <BookOpen className={`h-16 w-16 ${darkMode ? 'text-[#8b949e]' : 'text-gray-400'} mx-auto mb-4 opacity-50`} />
+            <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#e6edf3]' : 'text-gray-900'}`}>{filter === 'favorites' ? 'Henüz favori reçete yok' : 'Henüz test edilmiş üretim yok'}</h3>
+            <p className={`${darkMode ? 'text-[#8b949e]' : 'text-gray-600'} mb-6`}>
               {filter === 'favorites'
                 ? 'Beğendiğiniz tarifleri favorilere ekleyin'
                 : 'Üretimlerinizi tamamlayın ve test edin'}
             </p>
-            <Button onClick={() => navigate('/workshop')}>Atölyeye Dön</Button>
+            <Button onClick={() => navigate('/workshop')} className={darkMode ? 'bg-[#C0A080] hover:bg-[#D4B99D] text-[#0D1117]' : ''}>
+              Atölyeye Dön
+            </Button>
           </div>
         )}
       </main>

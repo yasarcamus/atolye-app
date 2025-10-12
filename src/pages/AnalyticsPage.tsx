@@ -1,12 +1,20 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, TrendingUp, DollarSign, Star, Beaker, Award } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, BarChart3, TrendingUp, DollarSign, Star, Beaker, Award } from 'lucide-react';
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 
 export function AnalyticsPage() {
   const navigate = useNavigate();
+  const [darkMode, setDarkMode] = useState(true);
+
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('darkMode');
+    const isDark = savedDarkMode === null ? true : savedDarkMode === 'true';
+    setDarkMode(isDark);
+  }, []);
 
   const productions = useLiveQuery(() => db.productions.toArray(), []);
   const materials = useLiveQuery(() => db.materials.toArray(), []);
