@@ -9,7 +9,7 @@ import { MaterialsPage } from '@/pages/MaterialsPage';
 import { RecipesPage } from '@/pages/RecipesPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage';
 import { ProductionDetailPage } from '@/pages/ProductionDetailPage';
-import { initializeSettings } from '@/lib/db';
+import { initializeSettings, initializeDefaultMaterials } from '@/lib/db';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isOnboarded = localStorage.getItem('distil_onboarded');
@@ -19,6 +19,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   useEffect(() => {
     initializeSettings();
+    initializeDefaultMaterials();
   }, []);
 
   return (

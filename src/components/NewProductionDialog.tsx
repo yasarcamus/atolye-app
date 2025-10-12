@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,7 @@ interface NewProductionDialogProps {
 
 export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogProps) {
   const { addProduction, settings } = useStore();
+  const formRef = useRef<HTMLFormElement>(null);
   const [formData, setFormData] = useState({
     name: '',
     essenceName: '',
@@ -28,6 +29,7 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
     alcoholCostPerMl: 0,
     waterCostPerMl: 0,
     essenceCostPerMl: 0,
+    bottleCostPerAdet: 0,
   });
   const [canAddCostCalculation, setCanAddCostCalculation] = useState(true);
 
@@ -45,7 +47,9 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
     const alcoholCost = alcoholAmount * formData.alcoholCostPerMl;
     const essenceCost = essenceAmount * formData.essenceCostPerMl;
     const waterCost = waterAmount * formData.waterCostPerMl;
-    const totalCost = alcoholCost + essenceCost + waterCost;
+    // Bottle cost (1 adet)
+    const bottleCost = formData.bottleCostPerAdet || 0;
+    const totalCost = alcoholCost + essenceCost + waterCost + bottleCost;
 
     const production: Omit<Production, 'id'> = {
       name: formData.name,
@@ -83,6 +87,7 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
       alcoholCostPerMl: 0,
       waterCostPerMl: 0,
       essenceCostPerMl: 0,
+      bottleCostPerAdet: 0,
     });
     
     onOpenChange(false);
@@ -101,6 +106,50 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
     checkCostLimit();
   }, [settings?.isPremium]);
 
+  // Prefill costs from default materials if present
+  useEffect(() => {
+    const loadDefaults = async () => {
+      const mats = await db.materials.toArray();
+      const alcohol = mats.find(m => m.type === 'alcohol');
+      const water = mats.find(m => m.type === 'water');
+      const bottle = mats.find(m => m.name.toLowerCase() === 'şişe');
+      setFormData(prev => ({
+        ...prev,
+        alcoholCostPerMl: alcohol ? alcohol.pricePerMl : prev.alcoholCostPerMl,
+        waterCostPerMl: water ? water.pricePerMl : prev.waterCostPerMl,
+        bottleCostPerAdet: bottle ? bottle.pricePerMl : prev.bottleCostPerAdet,
+      }));
+    };
+    loadDefaults();
+  }, []);
+
+  // Helpers: clear zero on focus and restore 0 on blur if empty
+  const handleFocusZeroClear = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.target.value === '0' || e.target.value === '0.00') {
+      e.target.select();
+    }
+  };
+  const handleBlurRestoreZero = (field: keyof typeof formData) => (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.target.value === '') {
+      setFormData({ ...formData, [field]: 0 } as any);
+    }
+  };
+
+  // Enter to focus next input within the form
+  const handleEnterNext = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const form = formRef.current;
+      if (!form) return;
+      const elements = Array.from(form.querySelectorAll<HTMLElement>('input, select, textarea, button'));
+      const idx = elements.findIndex(el => el === e.currentTarget);
+      if (idx >= 0 && idx < elements.length - 1) {
+        const next = elements[idx + 1] as HTMLElement;
+        next.focus();
+      }
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -108,7 +157,7 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
           <DialogTitle>Yeni Üretim Başlat</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Parfüm Adı *</Label>
@@ -118,6 +167,7 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Örn: Kirke"
                 required
+                onKeyDown={handleEnterNext}
               />
             </div>
             
@@ -211,6 +261,9 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
                     min="0"
                     value={formData.alcoholCostPerMl}
                     onChange={(e) => setFormData({ ...formData, alcoholCostPerMl: Number(e.target.value) })}
+                    onFocus={handleFocusZeroClear}
+                    onBlur={handleBlurRestoreZero('alcoholCostPerMl')}
+                    onKeyDown={handleEnterNext}
                   />
                 </div>
                 
@@ -223,6 +276,9 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
                     min="0"
                     value={formData.essenceCostPerMl}
                     onChange={(e) => setFormData({ ...formData, essenceCostPerMl: Number(e.target.value) })}
+                    onFocus={handleFocusZeroClear}
+                    onBlur={handleBlurRestoreZero('essenceCostPerMl')}
+                    onKeyDown={handleEnterNext}
                   />
                 </div>
                 
@@ -235,6 +291,25 @@ export function NewProductionDialog({ open, onOpenChange }: NewProductionDialogP
                     min="0"
                     value={formData.waterCostPerMl}
                     onChange={(e) => setFormData({ ...formData, waterCostPerMl: Number(e.target.value) })}
+                    onFocus={handleFocusZeroClear}
+                    onBlur={handleBlurRestoreZero('waterCostPerMl')}
+                    onKeyDown={handleEnterNext}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="bottleCost">Şişe (₺/adet)</Label>
+                  <Input
+                    id="bottleCost"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.bottleCostPerAdet}
+                    onChange={(e) => setFormData({ ...formData, bottleCostPerAdet: Number(e.target.value) })}
+                    onFocus={handleFocusZeroClear}
+                    onBlur={handleBlurRestoreZero('bottleCostPerAdet')}
+                    onKeyDown={handleEnterNext}
                   />
                 </div>
               </div>

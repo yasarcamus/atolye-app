@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,15 +15,23 @@ export function MaterialsPage() {
   const { darkMode } = useTheme();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     name: '',
     type: 'alcohol' as 'alcohol' | 'water' | 'essence' | 'other',
     pricePerMl: 0,
-    unit: 'ml' as 'ml' | 'g',
+    unit: 'ml' as 'ml' | 'g' | 'adet',
     stock: 0,
   });
 
   const materials = useLiveQuery(() => db.materials.orderBy('createdAt').reverse().toArray(), []);
+  const settings = useLiveQuery(() => db.settings.toCollection().first(), []);
+
+  const defaultNames = ['Alkol', 'Saf Su', 'Şişe'];
+  const customCount = (materials || []).filter(m => !defaultNames.includes(m.name)).length;
+  const maxCustomForFree = 2; // default 3 + 2 custom = 5 toplam
+  const isPremium = !!settings?.isPremium;
+  const canAddMore = isPremium || customCount < maxCustomForFree;
 
   const handleOpenDialog = (material?: Material) => {
     if (material) {
@@ -45,7 +53,11 @@ export function MaterialsPage() {
         stock: 0,
       });
     }
-    setDialogOpen(true);
+    if (canAddMore || material) {
+      setDialogOpen(true);
+    } else {
+      alert('Ücretsiz hesaplarda en fazla 5 hammadde eklenebilir. Premium’a geçerek sınırı kaldırın.');
+    }
   };
 
   const handleSave = async () => {
@@ -67,6 +79,29 @@ export function MaterialsPage() {
   const handleDelete = async (id: number) => {
     if (confirm('Bu hammaddeyi silmek istediğinizden emin misiniz?')) {
       await db.materials.delete(id);
+    }
+  };
+
+  const handleFocusZeroClear = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.target.value === '0' || e.target.value === '0.00') {
+      e.target.select();
+    }
+  };
+  const handleBlurRestoreZero = (field: keyof typeof formData) => (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.target.value === '') {
+      setFormData({ ...formData, [field]: 0 } as any);
+    }
+  };
+  const handleEnterNext = (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const container = formRef.current;
+      if (!container) return;
+      const elements = Array.from(container.querySelectorAll<HTMLElement>('input, select, button'));
+      const idx = elements.findIndex(el => el === e.currentTarget);
+      if (idx >= 0 && idx < elements.length - 1) {
+        (elements[idx + 1] as HTMLElement).focus();
+      }
     }
   };
 
@@ -108,7 +143,7 @@ export function MaterialsPage() {
                 <p className="text-sm text-muted-foreground">Malzeme ve fiyat takibi</p>
               </div>
             </div>
-            <Button onClick={() => handleOpenDialog()} className="gap-2">
+            <Button onClick={() => handleOpenDialog()} className="gap-2" disabled={!canAddMore} title={!canAddMore ? 'Ücretsiz hesaplarda en fazla 5 hammadde eklenebilir' : undefined}>
               <Plus className="h-4 w-4" />
               Yeni Hammadde
             </Button>
@@ -174,32 +209,32 @@ export function MaterialsPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-xl border shadow-sm">
+          <div className={`text-center py-16 ${darkMode ? 'bg-[#161B22] border-[#30363d]' : 'bg-white'} rounded-xl border shadow-sm`}>
             <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-lg font-semibold mb-2">Henüz hammadde yok</h3>
             <p className="text-muted-foreground mb-6">
               İlk hammaddenizi ekleyin ve maliyet hesaplamalarını kolaylaştırın
             </p>
-            <Button onClick={() => handleOpenDialog()} className="gap-2">
+            <Button onClick={() => handleOpenDialog()} className="gap-2" disabled={!canAddMore}>
               <Plus className="h-4 w-4" />
               Hammadde Ekle
             </Button>
           </div>
         )}
       </main>
-
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{editingMaterial ? 'Hammadde Düzenle' : 'Yeni Hammadde'}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div ref={formRef} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Hammadde Adı *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onKeyDown={handleEnterNext}
                 placeholder="Örn: Etil Alkol 96%"
               />
             </div>
@@ -212,7 +247,7 @@ export function MaterialsPage() {
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                >
+                  onKeyDown={handleEnterNext}>
                   <option value="alcohol">Alkol</option>
                   <option value="water">Su</option>
                   <option value="essence">Esans</option>
@@ -227,9 +262,10 @@ export function MaterialsPage() {
                   value={formData.unit}
                   onChange={(e) => setFormData({ ...formData, unit: e.target.value as any })}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                >
+                  onKeyDown={handleEnterNext}>
                   <option value="ml">ml</option>
                   <option value="g">g</option>
+                  <option value="adet">adet</option>
                 </select>
               </div>
             </div>
@@ -244,6 +280,9 @@ export function MaterialsPage() {
                   min="0"
                   value={formData.pricePerMl}
                   onChange={(e) => setFormData({ ...formData, pricePerMl: Number(e.target.value) })}
+                  onFocus={handleFocusZeroClear}
+                  onBlur={handleBlurRestoreZero('pricePerMl')}
+                  onKeyDown={handleEnterNext}
                 />
               </div>
 
@@ -255,6 +294,9 @@ export function MaterialsPage() {
                   min="0"
                   value={formData.stock}
                   onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })}
+                  onFocus={handleFocusZeroClear}
+                  onBlur={handleBlurRestoreZero('stock')}
+                  onKeyDown={handleEnterNext}
                 />
               </div>
             </div>
@@ -273,3 +315,4 @@ export function MaterialsPage() {
     </div>
   );
 }
+

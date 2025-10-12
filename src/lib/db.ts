@@ -41,8 +41,8 @@ export interface Material {
   id?: number;
   name: string;
   type: 'alcohol' | 'water' | 'essence' | 'other';
-  pricePerMl: number;
-  unit: 'ml' | 'g';
+  pricePerMl: number; // Price per unit (depends on unit)
+  unit: 'ml' | 'g' | 'adet';
   stock?: number;
   createdAt: Date;
   updatedAt: Date;
@@ -103,5 +103,18 @@ export const initializeSettings = async () => {
       createdAt: new Date(),
       updatedAt: new Date()
     });
+  }
+};
+
+// Initialize default materials (Alkol, Saf Su, Şişe)
+export const initializeDefaultMaterials = async () => {
+  const count = await db.materials.count();
+  if (count === 0) {
+    const now = new Date();
+    await db.materials.bulkAdd([
+      { name: 'Alkol', type: 'alcohol', pricePerMl: 0, unit: 'ml', createdAt: now, updatedAt: now },
+      { name: 'Saf Su', type: 'water', pricePerMl: 0, unit: 'ml', createdAt: now, updatedAt: now },
+      { name: 'Şişe', type: 'other', pricePerMl: 0, unit: 'adet', createdAt: now, updatedAt: now },
+    ]);
   }
 };
